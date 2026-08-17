@@ -1,0 +1,43 @@
+:root {
+  --pt-primary: #4f46e5;
+  --pt-primary-dark: #3730a3;
+  --pt-bg: #f5f6fb;
+}
+
+body {
+  background-color: var(--pt-bg);
+}
+
+.pt-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pt-brand {
+  font-weight: 700;
+  color: var(--pt-primary) !important;
+}
+
+.pt-card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.pt-btn-primary {
+  background-color: var(--pt-primary);
+  border-color: var(--pt-primary);
+}
+
+.pt-btn-primary:hover {
+  background-color: var(--pt-primary-dark);
+  border-color: var(--pt-primary-dark);
+}
+
+.pt-auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2ff 0%, #f5f6fb 100%);
+}

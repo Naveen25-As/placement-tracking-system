@@ -6,7 +6,10 @@ import com.placementtracker.entity.User;
 import com.placementtracker.enums.LoginStatus;
 import com.placementtracker.enums.Role;
 import com.placementtracker.exception.ResourceNotFoundException;
-import com.placementtracker.exception.UnauthorizedException;
+import com.placementtracker.exception.BadRequestException;
+import com.placementtracker.exception.ForbiddenException;
+import com.placementtracker.repository.ApplicationRepository;
+import com.placementtracker.repository.StudentProfileRepository;
 import com.placementtracker.repository.LoginActivityRepository;
 import com.placementtracker.repository.PlacementApplicationRepository;
 import com.placementtracker.repository.UserRepository;
@@ -32,6 +35,8 @@ public class AdminService {
     private final LoginActivityRepository loginActivityRepository;
     private final PlacementApplicationRepository placementRepository;
     private final UserService userService;
+    private final ApplicationRepository applicationRepository;
+    private final StudentProfileRepository studentProfileRepository;
 
     public AdminDashboardResponse getDashboard() {
         List<LoginActivityResponse> recentLogins = loginActivityRepository
@@ -43,7 +48,7 @@ public class AdminService {
         return AdminDashboardResponse.builder()
                 .totalUsers(userRepository.count())
                 .totalPlacements(placementRepository.count())
-                .onlineUsers(loginActivityRepository.countByStatus(LoginStatus.ONLINE))
+                .onlineUsers(loginActivityRepository.countDistinctUsersByStatus(LoginStatus.ONLINE))
                 .totalLoginActivities(loginActivityRepository.count())
                 .recentLogins(recentLogins)
                 .build();
@@ -67,13 +72,15 @@ public class AdminService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.getId().equals(currentAdmin.getId())) {
-            throw new UnauthorizedException("Cannot delete your own account");
+            throw new BadRequestException("Cannot delete your own account");
         }
 
         if (user.getRole() == Role.ADMIN) {
-            throw new UnauthorizedException("Cannot delete admin accounts");
+            throw new ForbiddenException("Cannot delete admin accounts");
         }
 
+        applicationRepository.deleteAll(applicationRepository.findByStudentId(user.getId()));
+        studentProfileRepository.findByUserId(user.getId()).ifPresent(studentProfileRepository::delete);
         userRepository.delete(user);
     }
 

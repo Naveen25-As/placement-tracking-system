@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,16 @@ public class JwtUtil {
 
     @Value("${jwt.expiration}")
     private long expiration;
+
+    @PostConstruct
+    void validateSecret() {
+        try {
+            getSignKey();
+        } catch (RuntimeException ex) {
+            throw new IllegalStateException(
+                    "JWT_SECRET must be a Base64-encoded key of at least 256 bits (e.g. `openssl rand -base64 64`)", ex);
+        }
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -1,4 +1,4 @@
-import api from './api'
+import api from '../api/axios'
 
 export const getJobs = () => api.get('/jobs').then((res) => res.data)
 

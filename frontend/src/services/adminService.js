@@ -1,4 +1,4 @@
-import api from './api'
+import api from '../api/axios'
 
 export const adminGetCompanies = () => api.get('/admin/companies').then((res) => res.data)
 export const adminCreateCompany = (payload) => api.post('/admin/companies', payload).then((res) => res.data)

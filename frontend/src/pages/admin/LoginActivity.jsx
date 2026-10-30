@@ -16,6 +16,7 @@ export default function LoginActivity() {
 
   const fetchActivities = async () => {
     setLoading(true);
+    setError('');
     try {
       const params = new URLSearchParams({ page, size: 15 });
       if (search) params.append('search', search);

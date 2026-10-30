@@ -6,12 +6,11 @@ import com.placementtracker.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,7 +23,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
-        return ResponseEntity.ok(ApiResponse.success("Registration successful", response));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Registration successful", response));
     }
 
     @PostMapping("/login")
@@ -35,6 +34,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.ok(ApiResponse.success("Logout successful", null));
+        }
         String token = extractToken(request);
         Long loginActivityId = token != null ? jwtUtil.extractLoginActivityId(token) : null;
         authService.logout(authentication.getName(), loginActivityId);

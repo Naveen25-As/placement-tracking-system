@@ -7,9 +7,21 @@ export const APPLICATION_STATUSES = [
   { value: 'REJECTED', label: 'Rejected' },
 ];
 
+function parseDate(dateStr) {
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (dateOnly) return new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]));
+  return new Date(dateStr);
+}
+
+export function todayISO() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export function formatDate(dateStr) {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-IN', {
+  return parseDate(dateStr).toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -47,5 +59,12 @@ export function statusLabel(status) {
 }
 
 export function getErrorMessage(error) {
-  return error.response?.data?.message || error.message || 'Something went wrong';
+  const data = error.response?.data;
+  if (data?.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+    const fieldErrors = Object.values(data.data).filter((v) => typeof v === 'string');
+    if (fieldErrors.length) return fieldErrors.join('. ');
+  }
+  if (data?.message) return data.message;
+  if (error.request && !error.response) return 'Unable to reach the server. Please check that the backend is running.';
+  return error.message || 'Something went wrong';
 }

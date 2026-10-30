@@ -19,6 +19,9 @@ public interface LoginActivityRepository extends JpaRepository<LoginActivity, Lo
 
     long countByStatus(LoginStatus status);
 
+    @Query("SELECT COUNT(DISTINCT la.user.id) FROM LoginActivity la WHERE la.status = :status")
+    long countDistinctUsersByStatus(@Param("status") LoginStatus status);
+
     List<LoginActivity> findTop10ByOrderByLoginTimeDesc();
 
     @Query("SELECT la FROM LoginActivity la WHERE " +

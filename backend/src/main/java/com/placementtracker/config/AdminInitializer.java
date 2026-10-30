@@ -34,6 +34,11 @@ public class AdminInitializer implements CommandLineRunner {
             return;
         }
 
+        if (adminPassword == null || adminPassword.isBlank()) {
+            log.warn("ADMIN_PASSWORD not set — skipping default admin creation");
+            return;
+        }
+
         if (!userRepository.existsByEmail(adminEmail)) {
             User admin = User.builder()
                     .name(adminName != null && !adminName.isBlank() ? adminName : "Admin")

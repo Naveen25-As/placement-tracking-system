@@ -15,6 +15,7 @@ export default function AdminPlacements() {
 
   const fetchPlacements = async () => {
     setLoading(true);
+    setError('');
     try {
       const params = new URLSearchParams({ page, size: 10 });
       if (search) params.append('search', search);

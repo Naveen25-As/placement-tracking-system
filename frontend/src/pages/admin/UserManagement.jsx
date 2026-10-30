@@ -14,6 +14,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     setLoading(true);
+    setError('');
     try {
       const params = new URLSearchParams({ page, size: 10 });
       if (search) params.append('search', search);

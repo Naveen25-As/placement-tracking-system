@@ -2,7 +2,7 @@ package com.placementtracker.service;
 
 import com.placementtracker.dto.*;
 import com.placementtracker.entity.*;
-import com.placementtracker.exception.BadRequestException;
+import com.placementtracker.exception.ForbiddenException;
 import com.placementtracker.exception.DuplicateResourceException;
 import com.placementtracker.exception.ResourceNotFoundException;
 import com.placementtracker.repository.ApplicationRepository;
@@ -56,7 +56,7 @@ public class ApplicationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + applicationId));
 
         if (!application.getStudent().getId().equals(studentId)) {
-            throw new BadRequestException("You can only update your own applications");
+            throw new ForbiddenException("You can only update your own applications");
         }
 
         application.setStatus(request.getStatus());

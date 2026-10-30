@@ -2,21 +2,21 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import api from '../../api/axios';
-import { APPLICATION_STATUSES, getErrorMessage } from '../../utils/helpers';
+import { APPLICATION_STATUSES, getErrorMessage, todayISO } from '../../utils/helpers';
 
 const emptyForm = {
   companyName: '',
   jobRole: '',
   location: '',
   packageAmount: '',
-  applicationDate: new Date().toISOString().split('T')[0],
+  applicationDate: todayISO(),
   status: 'APPLIED',
   interviewDate: '',
   notes: '',
 };
 
 export default function ApplicationForm({ editId = null, initialData = null }) {
-  const [form, setForm] = useState(initialData || emptyForm);
+  const [form, setForm] = useState(initialData || { ...emptyForm, applicationDate: todayISO() });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -5,6 +6,11 @@ export default function Navbar() {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -21,13 +27,11 @@ export default function Navbar() {
           Placement Tracker
         </Link>
 
-        <button className="nav-toggle" aria-label="Toggle menu" onClick={() => {
-          document.querySelector('.nav-links')?.classList.toggle('open');
-        }}>
+        <button className="nav-toggle" aria-label="Toggle menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
           ☰
         </button>
 
-        <div className="nav-links">
+        <div className={`nav-links${menuOpen ? ' open' : ''}`}>
           {user ? (
             <>
               {isAdmin ? (

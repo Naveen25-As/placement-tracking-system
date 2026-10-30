@@ -6,6 +6,7 @@ import com.placementtracker.dto.UserResponse;
 import com.placementtracker.entity.User;
 import com.placementtracker.util.SecurityUtils;
 import com.placementtracker.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
         User user = securityUtils.getCurrentUser();
         return ResponseEntity.ok(ApiResponse.success(userService.updateProfile(user, request)));
     }

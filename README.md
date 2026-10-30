@@ -1,236 +1,84 @@
-# 🚀 Byte Society — Tech Club Website
+# Placement Tracking System
 
-A modern and responsive website concept for a college **Tech Club**, created using AI-assisted web development tools.
+Full-stack app for students to track placement applications and for admins to monitor users, placements and login activity.
 
-This repository contains **two different versions** of the website, developed using **Claude** and **Windsurf**, allowing comparison of AI-generated designs, code structure, and customization.
+| Layer | Stack |
+|---|---|
+| Frontend | React 18, Vite 6, React Router 6, Axios (`frontend/`) |
+| Backend | Java 17, Spring Boot 3.4, Spring Data JPA, Spring Security + JWT (`backend/`) |
+| Database | MySQL 8 (`database/schema.sql` for reference; Hibernate creates tables automatically) |
 
----
+## Features
 
-## 🌐 Project Overview
+- Register / login / logout with JWT (BCrypt-hashed passwords, login activity tracking)
+- Students: dashboard stats, add / edit / delete / search / filter placement applications, profile
+- Admins: dashboard, user management (view / delete), login activity (search, status and date filters), all placements
+- Additional REST module: `/api/companies`, `/api/jobs`, `/api/applications`, `/api/profile`
 
-**Byte Society** is a college technology club focused on bringing students together to learn, build, collaborate, and explore emerging technologies.
+## Prerequisites
 
-The website is designed to provide information about:
+- Java 17+, Node.js 18+ and npm, MySQL 8 running locally
 
-* 💻 Tech Club activities
-* 🚀 Events and workshops
-* 🛠️ Projects
-* 👥 Team members
-* 📢 Announcements
-* 📩 Contact and registration
+## 1. Database
 
----
-
-## 🤖 AI-Assisted Development
-
-Two versions of the website were created using different AI development tools:
-
-| Version   | AI Tool  |
-| --------- | -------- |
-| Version 1 | Claude   |
-| Version 2 | Windsurf |
-
-The AI tools were used to assist with:
-
-* Website structure
-* UI design ideas
-* HTML/CSS/JavaScript generation
-* Debugging
-* Responsive design
-* Code improvement
-
-The generated code was **reviewed, tested, and customized** during development.
-
----
-
-## 📂 Project Structure
-
-```text
-byte-society-tech-club/
-│
-├── Claude/
-│   ├── index.html
-│   ├── style.css
-│   └── script.js
-│
-├── windsurf/
-│   ├── index.html
-│   ├── style.css
-│   ├── script.js
-│   └── README.md
-│
-└── README.md
+```sql
+CREATE DATABASE IF NOT EXISTS placement_tracker;
+CREATE USER IF NOT EXISTS 'pts'@'localhost' IDENTIFIED BY 'choose_a_password';
+GRANT ALL PRIVILEGES ON placement_tracker.* TO 'pts'@'localhost';
 ```
 
----
+Tables are created/updated on backend startup (`ddl-auto=update`); no data is dropped.
 
-## 🛠️ Technologies Used
+## 2. Backend (http://localhost:8080)
 
-### Frontend
+Create `backend/.env` (git-ignored, loaded automatically) or export the same variables:
 
-* HTML5
-* CSS3
-* JavaScript
-* Bootstrap 5
-* Bootstrap Icons
-
-### Development Tools
-
-* Visual Studio Code
-* Git
-* GitHub
-
-### AI Tools
-
-* Claude
-* Windsurf
-
----
-
-## ✨ Features
-
-* 📱 Responsive design
-* 🎨 Modern user interface
-* 🧭 Responsive navigation bar
-* 🎯 Hero section
-* 📅 Events section
-* 🛠️ Projects section
-* 👥 Team section
-* 📩 Contact section
-* ⚡ Interactive JavaScript components
-* 📱 Mobile-friendly layout
-
----
-
-## 🖥️ Getting Started
-
-### 1. Clone the repository
+```properties
+DB_URL=jdbc:mysql://localhost:3306/placement_tracker?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=pts
+DB_PASSWORD=choose_a_password
+# Base64 key, at least 256 bits: openssl rand -base64 64
+JWT_SECRET=<output of openssl rand -base64 64>
+# Optional: creates an admin account on first start
+ADMIN_NAME=Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=<strong password>
+# Optional, comma-separated CORS origins (default http://localhost:5173)
+FRONTEND_URL=http://localhost:5173
+```
 
 ```bash
-git clone https://github.com/Naveen25-As/byte-society-tech-club.git
+cd backend
+./mvnw spring-boot:run          # or: ./mvnw package && java -jar target/placement-tracker-backend-1.0.0.jar
+curl http://localhost:8080/api/health
 ```
 
-### 2. Navigate to the project
+## 3. Frontend (http://localhost:5173)
 
 ```bash
-cd byte-society-tech-club
+cd frontend
+npm install
+npm run dev        # /api is proxied to http://localhost:8080
+npm run build      # production build in dist/
 ```
 
-### 3. Open a version
+For production set `VITE_API_BASE_URL` to the backend URL including `/api` (see `frontend/.env.example`).
 
-For the Claude version:
+## Deployment (Render)
 
-```text
-Claude/index.html
-```
+`render.yaml` defines a Docker web service for the backend and a static site for the frontend. Set the backend variables above plus `FRONTEND_URL` (the static site URL), and `VITE_API_BASE_URL` on the frontend.
 
-For the Windsurf version:
+## API overview
 
-```text
-windsurf/index.html
-```
+| Method | Path | Auth |
+|---|---|---|
+| POST | `/api/auth/register`, `/api/auth/login`, `/api/auth/logout` | public |
+| GET | `/api/health` | public |
+| GET/POST | `/api/placements` (`search`, `status`, `page`, `size`) | user |
+| GET/PUT/DELETE | `/api/placements/{id}` | owner |
+| GET | `/api/placements/stats` | user |
+| GET/PUT | `/api/users/profile` | user |
+| GET | `/api/admin/dashboard`, `/api/admin/users`, `/api/admin/users/{id}`, `/api/admin/login-activities`, `/api/admin/placements` | admin |
+| DELETE | `/api/admin/users/{id}` | admin |
 
-You can open either `index.html` directly in a browser or use the **Live Server** extension in VS Code.
-
----
-
-## 🔍 AI Tool Comparison
-
-This project was also created as a small experiment to compare AI-assisted website development.
-
-### Claude
-
-Used for:
-
-* Initial website generation
-* HTML/CSS/JavaScript assistance
-* UI improvements
-* Debugging
-
-### Windsurf
-
-Used for:
-
-* AI-assisted coding
-* Code generation
-* Project modifications
-* Development assistance
-
-The two versions can be compared based on:
-
-* UI/UX
-* Code structure
-* Responsiveness
-* Ease of customization
-* AI-assisted development workflow
-
----
-
-## 📸 Screenshots
-
-Screenshots of both versions can be added here.
-
-### Claude Version
-Screenshot 2026-08-15 091849.png
-
-### Windsurf Version
-image.png
-
-
----
-
-## 🎯 Purpose of the Project
-
-This project was created to:
-
-* Practice frontend web development
-* Explore AI-assisted software development
-* Learn how different AI tools approach the same problem
-* Improve HTML, CSS and JavaScript skills
-* Practice Git and GitHub
-* Build a project suitable for a college Tech Club portfolio
-
----
-
-## 📚 What I Learned
-
-Through this project, I practiced:
-
-* Building responsive websites
-* Structuring HTML pages
-* Styling websites using CSS and Bootstrap
-* Adding interactivity using JavaScript
-* Using AI tools effectively during development
-* Reviewing and modifying AI-generated code
-* Managing projects using Git
-* Hosting projects on GitHub
-
----
-
-## 🚀 Future Improvements
-
-* [ ] Add backend functionality
-* [ ] Add student registration system
-* [ ] Add database integration
-* [ ] Add admin dashboard
-* [ ] Add event registration
-* [ ] Add authentication
-* [ ] Add dynamic event management
-* [ ] Deploy both versions using GitHub Pages
-
----
-
-## 👨‍💻 Developer
-
-**Naveen Asundi**
-
-BCA Student | Web Development & AI Enthusiast
-
-GitHub:
-https://github.com/Naveen25-As
-
----
-
-## 📄 License
-
-This project is created for educational and portfolio purposes.
+Errors use `{ "success": false, "message": "...", "data": {field: error} }` with 400 / 401 / 403 / 404 / 409 status codes.

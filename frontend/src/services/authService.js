@@ -1,4 +1,4 @@
-import api from './api'
+import api from '../api/axios'
 
 export const register = (payload) => api.post('/auth/register', payload).then((res) => res.data)
 

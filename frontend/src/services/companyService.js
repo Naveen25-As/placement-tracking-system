@@ -1,4 +1,4 @@
-import api from './api'
+import api from '../api/axios'
 
 export const searchCompanies = (params = {}) =>
   api.get('/companies', { params }).then((res) => res.data)
